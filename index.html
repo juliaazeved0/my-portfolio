@@ -1,0 +1,652 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Julia Azevedo — dev</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0a0a0f;
+  --bg2:#0f0f17;
+  --surface:#13131e;
+  --border:#1e1e30;
+  --accent:#00ff9f;
+  --accent2:#b47fff;
+  --accent3:#ff6b9d;
+  --accent4:#ffd166;
+  --text:#e8e8f0;
+  --muted:#6b6b8a;
+  --pixel:'Press Start 2P',monospace;
+  --body:'Inter',sans-serif;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{
+  background:var(--bg);
+  color:var(--text);
+  font-family:var(--body);
+  font-size:15px;
+  line-height:1.7;
+  overflow-x:hidden;
+  cursor:none;
+}
+
+/* CURSOR */
+#cursor{width:12px;height:12px;background:var(--accent);position:fixed;pointer-events:none;z-index:9999;transition:transform 0.1s;}
+#cursor-trail{width:6px;height:6px;background:var(--accent2);position:fixed;pointer-events:none;z-index:9998;opacity:0.5;transition:left 0.12s,top 0.12s;}
+
+/* CANVAS */
+#particles{position:fixed;inset:0;pointer-events:none;z-index:0;opacity:0.4;}
+
+/* SCANLINES */
+body::after{
+  content:'';position:fixed;inset:0;
+  background:repeating-linear-gradient(0deg,transparent,transparent 3px,rgba(0,0,0,0.12) 3px,rgba(0,0,0,0.12) 4px);
+  pointer-events:none;z-index:1;
+}
+
+/* NAV */
+nav{
+  position:fixed;top:0;left:0;right:0;z-index:100;
+  padding:1.25rem 3rem;
+  display:flex;justify-content:space-between;align-items:center;
+  border-bottom:1px solid var(--border);
+  background:rgba(10,10,15,0.88);
+  backdrop-filter:blur(12px);
+}
+.nav-logo{font-family:var(--pixel);font-size:11px;color:var(--accent);text-decoration:none;letter-spacing:1px;}
+.nav-logo span{color:var(--accent2);}
+.nav-links{display:flex;gap:2.5rem;list-style:none;}
+.nav-links a{
+  font-size:12px;color:var(--muted);text-decoration:none;
+  letter-spacing:0.05em;font-weight:400;transition:color 0.2s;position:relative;
+}
+.nav-links a::after{content:'';position:absolute;bottom:-2px;left:0;width:0;height:1px;background:var(--accent);transition:width 0.3s;}
+.nav-links a:hover{color:var(--accent);}
+.nav-links a:hover::after{width:100%;}
+
+/* LAYOUT */
+.page{max-width:900px;margin:0 auto;padding:0 2.5rem;position:relative;z-index:2;}
+
+/* HERO */
+.hero{min-height:100vh;display:flex;flex-direction:column;justify-content:center;padding-top:5rem;position:relative;}
+.hero-pre{
+  font-family:var(--pixel);font-size:9px;color:var(--muted);
+  letter-spacing:2px;margin-bottom:1.5rem;
+  opacity:0;animation:fadeUp 0.6s 0.2s forwards;
+}
+.hero-pre .blink{color:var(--accent);animation:blink 1s step-end infinite;}
+@keyframes blink{50%{opacity:0;}}
+.hero-name{
+  font-family:var(--pixel);font-size:clamp(18px,3.5vw,36px);line-height:1.8;
+  margin-bottom:0.5rem;opacity:0;animation:fadeUp 0.6s 0.4s forwards;
+}
+.hero-name .l1{color:var(--text);}
+.hero-name .l2{color:var(--accent2);}
+.hero-role{
+  font-family:var(--pixel);font-size:clamp(9px,1.4vw,12px);color:var(--accent);
+  margin-bottom:2.5rem;min-height:1.6em;opacity:0;animation:fadeUp 0.6s 0.6s forwards;
+}
+.hero-grid{
+  display:grid;grid-template-columns:1fr auto;gap:4rem;align-items:center;
+  opacity:0;animation:fadeUp 0.7s 0.8s forwards;
+}
+.hero-bio{font-size:14px;color:var(--muted);line-height:1.9;max-width:420px;margin-bottom:2.5rem;}
+.hero-bio strong{color:var(--text);font-weight:500;}
+.hero-btns{display:flex;gap:1rem;flex-wrap:wrap;}
+.btn{
+  font-family:var(--pixel);font-size:8px;padding:14px 22px;text-decoration:none;
+  letter-spacing:1px;transition:all 0.2s;border:1px solid;
+  display:inline-block;position:relative;overflow:hidden;
+}
+.btn::before{
+  content:'';position:absolute;inset:0;background:var(--accent);
+  transform:translateX(-101%);transition:transform 0.25s;z-index:0;
+}
+.btn:hover::before{transform:translateX(0);}
+.btn span{position:relative;z-index:1;}
+.btn-primary{border-color:var(--accent);color:var(--accent);}
+.btn-primary:hover{color:var(--bg);}
+.btn-ghost{border-color:var(--border);color:var(--muted);}
+.btn-ghost::before{background:var(--surface);}
+.btn-ghost:hover{color:var(--text);}
+.hero-tags{display:flex;flex-wrap:wrap;gap:8px;margin-top:2rem;}
+.tag{font-size:11px;color:var(--muted);border:1px solid var(--border);padding:4px 12px;border-radius:2px;transition:all 0.2s;}
+.tag:hover{border-color:var(--accent2);color:var(--accent2);}
+
+/* FOTO */
+.hero-photo-area{display:flex;flex-direction:column;align-items:center;gap:1.5rem;}
+.photo-ring{
+  width:180px;height:180px;border:2px solid var(--accent);
+  border-radius:50%;padding:4px;position:relative;
+  animation:ringPulse 4s ease-in-out infinite;
+}
+@keyframes ringPulse{
+  0%,100%{box-shadow:0 0 0 0 rgba(0,255,159,0.3);}
+  50%{box-shadow:0 0 24px 4px rgba(0,255,159,0.12);}
+}
+.photo-inner{width:100%;height:100%;border-radius:50%;overflow:hidden;background:var(--surface);}
+.photo-inner img{width:100%;height:100%;object-fit:cover;object-position:center top;display:block;filter:grayscale(15%);transition:filter 0.4s;}
+.photo-ring:hover .photo-inner img{filter:grayscale(0%);}
+.status-badge{
+  font-family:var(--pixel);font-size:7px;color:var(--accent);
+  border:1px solid rgba(0,255,159,0.25);padding:6px 14px;
+  letter-spacing:1px;display:flex;align-items:center;gap:8px;
+  background:rgba(0,255,159,0.05);
+}
+.status-dot{width:6px;height:6px;background:var(--accent);border-radius:50%;animation:pulse 2s ease-in-out infinite;}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1);}50%{opacity:0.4;transform:scale(0.8);}}
+
+/* SCROLL HINT */
+.scroll-hint{
+  position:absolute;bottom:2.5rem;left:50%;transform:translateX(-50%);
+  display:flex;flex-direction:column;align-items:center;gap:8px;
+  opacity:0;animation:fadeIn 1s 1.8s forwards;
+}
+.scroll-arrow{width:1px;height:40px;background:linear-gradient(to bottom,var(--accent),transparent);animation:scrollPulse 2s ease-in-out infinite;}
+@keyframes scrollPulse{0%,100%{opacity:0.3;}50%{opacity:1;}}
+.scroll-label{font-family:var(--pixel);font-size:7px;color:var(--muted);letter-spacing:2px;}
+
+/* SEÇÕES */
+section{padding:6rem 0;}
+.sec-kicker{
+  font-family:var(--pixel);font-size:8px;color:var(--accent);
+  letter-spacing:3px;margin-bottom:1rem;
+  display:flex;align-items:center;gap:12px;
+}
+.sec-kicker::before{content:'';display:inline-block;width:20px;height:1px;background:var(--accent);}
+.sec-h{font-family:var(--pixel);font-size:clamp(14px,2.5vw,22px);color:var(--text);line-height:1.6;margin-bottom:3rem;}
+
+/* DIVISOR */
+.px-div{
+  width:100%;height:1px;
+  background:repeating-linear-gradient(90deg,var(--border) 0,var(--border) 4px,transparent 4px,transparent 8px);
+  margin:0 0 3rem;
+}
+
+/* SOBRE */
+.about-layout{display:grid;grid-template-columns:1fr 1fr;gap:4rem;align-items:start;}
+.about-label-s{font-family:var(--pixel);font-size:7px;color:var(--accent2);letter-spacing:3px;margin-bottom:1rem;display:block;}
+.about-p{font-size:14px;color:var(--muted);line-height:1.9;}
+.about-p strong{color:var(--text);font-weight:500;}
+.about-quote{
+  grid-column:1/-1;border-left:3px solid var(--accent2);
+  padding:0.75rem 0 0.75rem 2rem;font-size:15px;font-style:italic;
+  color:var(--muted);font-weight:300;line-height:1.7;
+}
+
+/* PROJETOS */
+.proj-item{
+  border-top:1px solid var(--border);padding:3rem 0;
+  display:grid;grid-template-columns:160px 1fr;gap:3rem;transition:background 0.3s;
+}
+.proj-item:last-child{border-bottom:1px solid var(--border);}
+.proj-item:hover{background:rgba(255,255,255,0.01);}
+.proj-index{font-family:var(--pixel);font-size:9px;color:var(--border);margin-bottom:0.75rem;}
+.proj-badge{font-family:var(--pixel);font-size:6px;padding:5px 8px;letter-spacing:1px;display:inline-block;margin-bottom:0.75rem;}
+.badge-game{background:rgba(255,107,157,0.1);color:var(--accent3);border:1px solid rgba(255,107,157,0.22);}
+.badge-research{background:rgba(180,127,255,0.1);color:var(--accent2);border:1px solid rgba(180,127,255,0.22);}
+.badge-data{background:rgba(0,255,159,0.07);color:var(--accent);border:1px solid rgba(0,255,159,0.18);}
+.proj-period{font-size:11px;color:var(--muted);margin-top:0.5rem;}
+.proj-title{
+  font-family:var(--pixel);font-size:clamp(10px,1.6vw,14px);color:var(--text);
+  line-height:1.7;margin-bottom:1rem;transition:color 0.2s;
+}
+.proj-item:hover .proj-title{color:var(--accent);}
+.proj-desc{font-size:14px;color:var(--muted);line-height:1.9;margin-bottom:1.5rem;}
+.proj-desc strong{color:var(--text);font-weight:500;}
+.proj-stack{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:1.5rem;}
+.stag{
+  font-size:10px;color:var(--muted);border:1px solid var(--border);
+  padding:3px 10px;border-radius:2px;transition:border-color 0.2s;
+}
+.proj-item:hover .stag{border-color:rgba(0,255,159,0.18);}
+
+/* VÍDEO */
+.video-box{
+  border:1px solid var(--border);border-radius:4px;
+  overflow:hidden;position:relative;background:var(--bg);
+  transition:border-color 0.3s;line-height:0;
+}
+.proj-item:hover .video-box{border-color:rgba(255,107,157,0.35);}
+.video-box video{width:100%;display:block;max-height:240px;object-fit:cover;}
+.video-label{
+  position:absolute;top:10px;left:12px;
+  font-family:var(--pixel);font-size:6px;color:var(--accent3);
+  letter-spacing:1px;background:rgba(10,10,15,0.82);padding:4px 8px;
+}
+
+/* SKILLS */
+.skills-wrap{display:grid;grid-template-columns:repeat(auto-fit,minmax(155px,1fr));gap:2px;}
+.skill-col{background:var(--surface);padding:2rem;transition:background 0.2s;}
+.skill-col:hover{background:var(--bg2);}
+.skill-col-title{font-family:var(--pixel);font-size:7px;color:var(--accent4);letter-spacing:2px;margin-bottom:1.25rem;padding-bottom:0.75rem;border-bottom:1px solid var(--border);}
+.skill-col ul{list-style:none;display:flex;flex-direction:column;gap:10px;}
+.skill-col li{font-size:13px;color:var(--muted);display:flex;align-items:center;gap:8px;transition:color 0.2s;}
+.skill-col:hover li{color:var(--text);}
+.skill-col li::before{content:'';width:4px;height:4px;background:var(--accent4);flex-shrink:0;}
+
+/* FORMAÇÃO */
+.edu-grid{display:flex;flex-direction:column;}
+.edu-row{
+  display:grid;grid-template-columns:130px 1fr;gap:2rem;
+  padding:1.75rem 0;border-bottom:1px solid var(--border);transition:background 0.2s;
+}
+.edu-row:first-child{border-top:1px solid var(--border);}
+.edu-row:hover{background:rgba(255,255,255,0.01);}
+.edu-year{font-size:12px;color:var(--muted);padding-top:2px;font-weight:300;}
+.edu-name{font-size:15px;color:var(--text);font-weight:400;margin-bottom:3px;}
+.edu-inst{font-size:13px;color:var(--muted);}
+.cert-head{font-family:var(--pixel);font-size:7px;color:var(--muted);letter-spacing:3px;margin:3rem 0 1.5rem;}
+.cert-row{
+  display:grid;grid-template-columns:1fr auto;gap:2rem;
+  padding:1rem 0;border-bottom:1px solid var(--border);align-items:center;transition:background 0.2s;
+}
+.cert-row:first-child{border-top:1px solid var(--border);}
+.cert-row:hover{background:rgba(255,255,255,0.01);}
+.cert-name-t{font-size:13px;color:var(--muted);}
+.cert-src{font-family:var(--pixel);font-size:7px;color:var(--border);text-align:right;letter-spacing:1px;}
+
+/* CONQUISTAS */
+.ach-row{display:grid;grid-template-columns:1fr 1fr;gap:2px;margin-top:3rem;}
+.ach-card{background:var(--surface);padding:2.5rem 2rem;transition:background 0.2s;}
+.ach-card:hover{background:var(--bg2);}
+.ach-num{font-family:var(--pixel);font-size:42px;color:var(--border);margin-bottom:1rem;line-height:1;transition:color 0.3s;}
+.ach-card:hover .ach-num{color:var(--accent4);}
+.ach-name{font-size:14px;color:var(--text);margin-bottom:4px;font-weight:400;}
+.ach-sub{font-size:12px;color:var(--muted);}
+
+/* PUBLICAÇÕES */
+.pub-list{display:flex;flex-direction:column;}
+.pub-row{padding:1.5rem 0;border-bottom:1px solid var(--border);display:flex;gap:1.5rem;align-items:baseline;transition:background 0.2s;}
+.pub-row:first-child{border-top:1px solid var(--border);}
+.pub-row:hover{background:rgba(255,255,255,0.01);}
+.pub-arrow{font-family:var(--pixel);font-size:8px;color:var(--border);flex-shrink:0;transition:color 0.2s;}
+.pub-row:hover .pub-arrow{color:var(--accent);}
+.pub-text{font-size:14px;color:var(--muted);font-style:italic;line-height:1.6;}
+
+/* CONTATO */
+.contact-area{display:grid;grid-template-columns:1fr 1fr;gap:4rem;align-items:start;}
+.contact-tagline{font-family:var(--pixel);font-size:clamp(11px,1.8vw,16px);color:var(--text);line-height:1.9;margin-bottom:2rem;}
+.contact-tagline span{color:var(--accent);}
+.cinfo-label{font-family:var(--pixel);font-size:7px;color:var(--muted);letter-spacing:2px;margin-bottom:4px;display:block;}
+.cinfo-val{font-size:13px;color:var(--text);margin-bottom:1.5rem;display:block;}
+.contact-links{display:flex;flex-direction:column;gap:1rem;}
+.clink{
+  display:flex;align-items:center;gap:1rem;text-decoration:none;
+  padding:1rem 1.25rem;border:1px solid var(--border);transition:all 0.2s;color:var(--muted);
+}
+.clink:hover{border-color:var(--accent);color:var(--text);background:rgba(0,255,159,0.04);}
+.clink-label{font-family:var(--pixel);font-size:7px;letter-spacing:2px;color:inherit;}
+.clink-val{font-size:12px;color:inherit;margin-top:3px;}
+.clink-arrow{margin-left:auto;font-family:var(--pixel);font-size:8px;color:var(--border);}
+.clink:hover .clink-arrow{color:var(--accent);}
+
+/* FOOTER */
+footer{border-top:1px solid var(--border);padding:2rem 0 3rem;display:flex;justify-content:space-between;align-items:center;}
+.footer-l{font-family:var(--pixel);font-size:7px;color:var(--muted);letter-spacing:1px;}
+.footer-r{font-size:12px;color:var(--muted);}
+
+/* REVEAL */
+.reveal{opacity:0;transform:translateY(24px);transition:opacity 0.7s,transform 0.7s;}
+.reveal.visible{opacity:1;transform:translateY(0);}
+
+/* GLITCH */
+.glitch:hover{animation:glitch 0.35s steps(2) 1;}
+@keyframes glitch{
+  0%{text-shadow:2px 0 var(--accent3),-2px 0 var(--accent2);}
+  33%{text-shadow:-2px 0 var(--accent3),2px 0 var(--accent2);}
+  66%{text-shadow:2px 2px var(--accent3),-2px -2px var(--accent2);}
+  100%{text-shadow:none;}
+}
+
+@keyframes fadeUp{from{opacity:0;transform:translateY(16px);}to{opacity:1;transform:translateY(0);}}
+@keyframes fadeIn{from{opacity:0;}to{opacity:1;}}
+
+@media(max-width:680px){
+  nav{padding:1rem 1.5rem;}
+  .nav-links{display:none;}
+  .page{padding:0 1.5rem;}
+  .hero-grid,.about-layout,.contact-area{grid-template-columns:1fr;}
+  .proj-item{grid-template-columns:1fr;}
+  .ach-row{grid-template-columns:1fr;}
+  .edu-row{grid-template-columns:1fr;gap:0.25rem;}
+  .footer-r{display:none;}
+}
+</style>
+</head>
+<body>
+
+<canvas id="particles"></canvas>
+<div id="cursor"></div>
+<div id="cursor-trail"></div>
+
+<nav>
+  <a class="nav-logo" href="#">julia<span>.</span>dev</a>
+  <ul class="nav-links">
+    <li><a href="#sobre">sobre</a></li>
+    <li><a href="#projetos">projetos</a></li>
+    <li><a href="#skills">skills</a></li>
+    <li><a href="#formacao">formação</a></li>
+    <li><a href="#contato">contato</a></li>
+  </ul>
+</nav>
+
+<div class="page">
+
+<!-- HERO -->
+<div class="hero" id="topo">
+  <p class="hero-pre">> iniciando sistema<span class="blink">_</span></p>
+  <div class="hero-name">
+    <div class="l1 glitch">julia caroline</div>
+    <div class="l2 glitch">de azevedo</div>
+  </div>
+  <div class="hero-role" id="typewriter"></div>
+
+  <div class="hero-grid">
+    <div>
+      <p class="hero-bio">
+        <strong>Desenvolvedora back-end</strong> em transição de carreira. De física e professora de robótica a engenheira de software — apaixonada por <strong>dados, sistemas</strong> e por construir coisas que importam.<br><br>
+        Estagiária no Itaipu Parquetec. Voluntária em pesquisa de ciência de dados e no <strong>Cyberlace</strong>, jogo para CTFs de segurança cibernética. Estudante de ADS no IFPR.
+      </p>
+      <div class="hero-btns">
+        <a href="https://github.com/juliaazeved0/" class="btn btn-primary" target="_blank" rel="noopener"><span>→ github</span></a>
+        <a href="https://www.linkedin.com/in/juliaazeved0" class="btn btn-ghost" target="_blank" rel="noopener"><span>linkedin</span></a>
+      </div>
+      <div class="hero-tags">
+        <span class="tag">C# · .NET</span>
+        <span class="tag">Python</span>
+        <span class="tag">Unity Engine</span>
+        <span class="tag">Microsserviços</span>
+        <span class="tag">Foz do Iguaçu · PR</span>
+        <span class="tag">remoto</span>
+      </div>
+    </div>
+
+    <div class="hero-photo-area">
+      <div class="photo-ring">
+        <div class="photo-inner">
+          <!-- FOTO: profile.jpeg na mesma pasta que index.html -->
+          <img src="profile.jpeg" alt="Julia Azevedo">
+        </div>
+      </div>
+      <div class="status-badge">
+        <div class="status-dot"></div>
+        disponível
+      </div>
+    </div>
+  </div>
+
+  <div class="scroll-hint">
+    <div class="scroll-arrow"></div>
+    <span class="scroll-label">scroll</span>
+  </div>
+</div>
+
+<!-- SOBRE -->
+<section id="sobre">
+  <div class="px-div"></div>
+  <p class="sec-kicker reveal">01 — sobre</p>
+  <h2 class="sec-h reveal">quem sou eu</h2>
+  <div class="about-layout reveal">
+    <div>
+      <span class="about-label-s">origem</span>
+      <p class="about-p">Comecei como <strong>professora de robótica e educação digital</strong> na rede municipal de Foz do Iguaçu, onde atuo há 7 anos. Foi numa capacitação para ensinar robótica que algo mudou: percebi que queria estar do outro lado do código — construindo, não apenas ensinando.</p>
+    </div>
+    <div>
+      <span class="about-label-s">hoje</span>
+      <p class="about-p">Estagiária no <strong>Itaipu Parquetec</strong> desenvolvendo soluções com .NET e Unity 3D. Curso ADS no IFPR e contribuo como voluntária em pesquisa de ciência de dados e no desenvolvimento do <strong>Cyberlace</strong>, jogo para CTFs de segurança cibernética.</p>
+    </div>
+    <blockquote class="about-quote">
+      "Tecnologia é mais poderosa quando constrói pontes — entre dados e decisão, entre o sistema e a pessoa que ele serve."
+    </blockquote>
+  </div>
+</section>
+
+<!-- PROJETOS -->
+<section id="projetos">
+  <div class="px-div"></div>
+  <p class="sec-kicker reveal">02 — projetos</p>
+  <h2 class="sec-h reveal">o que estou construindo</h2>
+
+  <div class="proj-item reveal">
+    <div>
+      <p class="proj-index">001</p>
+      <span class="proj-badge badge-game">jogo · voluntária</span>
+      <p class="proj-period">dez 2025 — abr 2026</p>
+    </div>
+    <div>
+      <h3 class="proj-title">Cyberlace — Ladies in Cyber</h3>
+      <p class="proj-desc">Jogo top-down em pixel art desenvolvido como iniciativa do <strong>Ladies in Cyber</strong> no Itaipu Parquetec, com o objetivo de aumentar a participação feminina em CTFs de segurança cibernética. Gamifica desafios reais de OSINT, Linux, engenharia social, forense digital e criptografia. Assumi o desenvolvimento completo com autonomia total, em ciclos quinzenais de entrega com metodologias ágeis.</p>
+      <div class="proj-stack">
+        <span class="stag">C#</span><span class="stag">Unity Engine</span><span class="stag">Pixel Art</span>
+        <span class="stag">Scrum</span><span class="stag">Trello</span><span class="stag">Notion</span><span class="stag">Miro</span>
+      </div>
+      <!-- VÍDEO: demo.mp4 na mesma pasta que index.html -->
+      <div class="video-box">
+        <span class="video-label">▶ gameplay</span>
+        <video autoplay muted loop playsinline>
+          <source src="demo.mp4" type="video/mp4">
+        </video>
+      </div>
+    </div>
+  </div>
+
+  <div class="proj-item reveal">
+    <div>
+      <p class="proj-index">002</p>
+      <span class="proj-badge badge-research">pesquisa · voluntária</span>
+      <p class="proj-period">2025</p>
+    </div>
+    <div>
+      <h3 class="proj-title">Mapeamento de Stack — Gêmeos Digitais Web</h3>
+      <p class="proj-desc">Pesquisa para apoiar a <strong>tomada de decisão tecnológica</strong> no Itaipu Parquetec: mapeamento da stack de projetos de Gêmeos Digitais na Web com Unity como engine de visualização. Coleta de repositórios via API do GitHub com Google Apps Script, triagem de artigos com <strong>ASReview e machine learning</strong>, estruturando indicadores sobre tecnologias e frameworks.</p>
+      <div class="proj-stack">
+        <span class="stag">Python</span><span class="stag">ASReview</span><span class="stag">Google Colab</span>
+        <span class="stag">Jupyter</span><span class="stag">Apps Script</span><span class="stag">GitHub API</span>
+        <span class="stag">Google Sheets</span><span class="stag">Machine Learning</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="proj-item reveal">
+    <div>
+      <p class="proj-index">003</p>
+      <span class="proj-badge badge-data">dados · ativo</span>
+      <p class="proj-period">fev 2025 — presente</p>
+    </div>
+    <div>
+      <h3 class="proj-title">Índices de Sustentabilidade — IFPR</h3>
+      <p class="proj-desc">Projeto de ciência de dados voluntário que analisa consumo de energia, água, materiais e geração de esgoto dos campi do IFPR para construir <strong>indicadores institucionais de sustentabilidade</strong>. Processamento e estruturação de dados brutos com Python e Pandas.</p>
+      <div class="proj-stack">
+        <span class="stag">Python</span><span class="stag">Pandas</span><span class="stag">Jupyter</span>
+        <span class="stag">Matplotlib</span><span class="stag">ETL</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SKILLS -->
+<section id="skills">
+  <div class="px-div"></div>
+  <p class="sec-kicker reveal">03 — habilidades</p>
+  <h2 class="sec-h reveal">stack técnica</h2>
+  <div class="skills-wrap reveal">
+    <div class="skill-col">
+      <div class="skill-col-title">linguagens</div>
+      <ul><li>C#</li><li>Python</li><li>Java</li><li>JavaScript</li></ul>
+    </div>
+    <div class="skill-col">
+      <div class="skill-col-title">frameworks</div>
+      <ul><li>.NET / ASP.NET</li><li>Spring Framework</li><li>Unity Engine</li><li>REST APIs</li></ul>
+    </div>
+    <div class="skill-col">
+      <div class="skill-col-title">dados & ML</div>
+      <ul><li>Pandas</li><li>Jupyter / Colab</li><li>ASReview</li><li>Matplotlib</li></ul>
+    </div>
+    <div class="skill-col">
+      <div class="skill-col-title">arquitetura</div>
+      <ul><li>Microsserviços</li><li>REST APIs</li><li>Docker</li><li>Git</li></ul>
+    </div>
+    <div class="skill-col">
+      <div class="skill-col-title">ferramentas</div>
+      <ul><li>Apps Script</li><li>GitHub API</li><li>Scrum / Kanban</li><li>Trello · Notion</li></ul>
+    </div>
+  </div>
+</section>
+
+<!-- FORMAÇÃO -->
+<section id="formacao">
+  <div class="px-div"></div>
+  <p class="sec-kicker reveal">04 — formação</p>
+  <h2 class="sec-h reveal">trajetória acadêmica</h2>
+
+  <div class="edu-grid reveal">
+    <div class="edu-row">
+      <span class="edu-year">2024 – 2026</span>
+      <div><p class="edu-name">ADS — Análise e Desenvolvimento de Sistemas</p><p class="edu-inst">IFPR — Instituto Federal do Paraná</p></div>
+    </div>
+    <div class="edu-row">
+      <span class="edu-year">2024</span>
+      <div><p class="edu-name">Especialização em Educação Digital</p><p class="edu-inst">UNIOESTE</p></div>
+    </div>
+    <div class="edu-row">
+      <span class="edu-year">2022 – 2024</span>
+      <div><p class="edu-name">Especialização — Métodos e Técnicas de Ensino</p><p class="edu-inst">UTFPR</p></div>
+    </div>
+    <div class="edu-row">
+      <span class="edu-year">2017 – 2021</span>
+      <div><p class="edu-name">Licenciatura em Física</p><p class="edu-inst">IFPR — Instituto Federal do Paraná</p></div>
+    </div>
+  </div>
+
+  <div class="reveal">
+    <p class="cert-head">certificações e cursos</p>
+    <div class="cert-row"><span class="cert-name-t">OCI — Oracle Cloud Infrastructure Foundations</span><span class="cert-src">Oracle</span></div>
+    <div class="cert-row"><span class="cert-name-t">Introdução à Cibersegurança</span><span class="cert-src">Cisco</span></div>
+    <div class="cert-row"><span class="cert-name-t">Fundamentos de Programação Orientada a Objetos</span><span class="cert-src">DIO</span></div>
+    <div class="cert-row"><span class="cert-name-t">Sintaxe Java</span><span class="cert-src">DIO</span></div>
+  </div>
+
+  <div class="reveal">
+    <p class="cert-head" style="margin-top:4rem;">conquistas</p>
+    <div class="ach-row">
+      <div class="ach-card">
+        <div class="ach-num">2º</div>
+        <p class="ach-name">TSW Women</p>
+        <p class="ach-sub">Competição de tecnologia para mulheres</p>
+      </div>
+      <div class="ach-card">
+        <div class="ach-num">4º</div>
+        <p class="ach-name">CTF SegInf 2025</p>
+        <p class="ach-sub">Capture The Flag · Segurança da Informação</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PUBLICAÇÕES -->
+<section>
+  <div class="px-div"></div>
+  <p class="sec-kicker reveal">05 — publicações</p>
+  <h2 class="sec-h reveal">escrita técnica & acadêmica</h2>
+  <div class="pub-list reveal">
+    <div class="pub-row"><span class="pub-arrow">→</span><p class="pub-text">A Mudança Epistemológica de Albert Einstein: do empirismo ao realismo</p></div>
+    <div class="pub-row"><span class="pub-arrow">→</span><p class="pub-text">A importância da alfabetização científica diante do fenômeno do misticismo quântico</p></div>
+    <div class="pub-row"><span class="pub-arrow">→</span><p class="pub-text">A nova atualização do ChatGPT e o impacto da Engenharia de Prompt</p></div>
+    <div class="pub-row"><span class="pub-arrow">→</span><p class="pub-text">Uma proposta de ensino didática para a primeira Lei de Newton</p></div>
+  </div>
+</section>
+
+<!-- CONTATO -->
+<section id="contato">
+  <div class="px-div"></div>
+  <p class="sec-kicker reveal">06 — contato</p>
+  <div class="contact-area">
+    <div class="reveal">
+      <h2 class="contact-tagline">vamos construir<br>algo <span>juntas?</span></h2>
+      <span class="cinfo-label">localização</span>
+      <span class="cinfo-val">Foz do Iguaçu, Paraná — remoto</span>
+      <span class="cinfo-label">e-mail</span>
+      <span class="cinfo-val">juliacarolinedeazevedo@gmail.com</span>
+    </div>
+    <div class="contact-links reveal">
+      <a href="mailto:juliacarolinedeazevedo@gmail.com" class="clink">
+        <div><div class="clink-label">e-mail</div><div class="clink-val">juliacarolinedeazevedo@gmail.com</div></div>
+        <span class="clink-arrow">→</span>
+      </a>
+      <a href="https://www.linkedin.com/in/juliaazeved0" class="clink" target="_blank" rel="noopener">
+        <div><div class="clink-label">linkedin</div><div class="clink-val">linkedin.com/in/juliaazeved0</div></div>
+        <span class="clink-arrow">→</span>
+      </a>
+      <a href="https://github.com/juliaazeved0/" class="clink" target="_blank" rel="noopener">
+        <div><div class="clink-label">github</div><div class="clink-val">github.com/juliaazeved0</div></div>
+        <span class="clink-arrow">→</span>
+      </a>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <span class="footer-l">julia.dev © 2026</span>
+  <span class="footer-r">Foz do Iguaçu, Paraná</span>
+</footer>
+
+</div>
+
+<script>
+/* CURSOR */
+const cur=document.getElementById('cursor');
+const trail=document.getElementById('cursor-trail');
+let mx=0,my=0;
+document.addEventListener('mousemove',e=>{
+  mx=e.clientX;my=e.clientY;
+  cur.style.left=(mx-6)+'px';cur.style.top=(my-6)+'px';
+});
+setInterval(()=>{trail.style.left=(mx-3)+'px';trail.style.top=(my-3)+'px';},80);
+
+/* PARTÍCULAS PIXEL */
+const cv=document.getElementById('particles');
+const cx=cv.getContext('2d');
+function resize(){cv.width=window.innerWidth;cv.height=window.innerHeight;}
+resize();window.addEventListener('resize',resize);
+const cols=['#00ff9f','#b47fff','#ff6b9d','#ffd166'];
+const pts=Array.from({length:55},()=>({
+  x:Math.random()*cv.width,y:Math.random()*cv.height,
+  s:Math.floor(Math.random()*3+1)*2,
+  vx:(Math.random()-0.5)*0.28,vy:(Math.random()-0.5)*0.28,
+  c:cols[Math.floor(Math.random()*cols.length)],
+  a:Math.random()*0.45+0.08
+}));
+(function draw(){
+  cx.clearRect(0,0,cv.width,cv.height);
+  pts.forEach(p=>{
+    cx.globalAlpha=p.a;cx.fillStyle=p.c;
+    cx.fillRect(p.x,p.y,p.s,p.s);
+    p.x+=p.vx;p.y+=p.vy;
+    if(p.x<0||p.x>cv.width)p.vx*=-1;
+    if(p.y<0||p.y>cv.height)p.vy*=-1;
+  });
+  cx.globalAlpha=1;requestAnimationFrame(draw);
+})();
+
+/* TYPEWRITER */
+const roles=['desenvolvedora back-end_','entusiasta de dados_','criadora do cyberlace_','ex-professora de robótica_','apaixonada por sistemas_'];
+let ri=0,ci=0,del=false;
+const tw=document.getElementById('typewriter');
+function type(){
+  const r=roles[ri];
+  if(!del){tw.textContent=r.slice(0,++ci);if(ci===r.length){del=true;setTimeout(type,1800);return;}}
+  else{tw.textContent=r.slice(0,--ci);if(ci===0){del=false;ri=(ri+1)%roles.length;}}
+  setTimeout(type,del?38:68);
+}
+type();
+
+/* SCROLL REVEAL */
+const obs=new IntersectionObserver(es=>{es.forEach(e=>{if(e.isIntersecting)e.target.classList.add('visible');});},{threshold:0.1});
+document.querySelectorAll('.reveal').forEach(el=>obs.observe(el));
+</script>
+</body>
+</html>
