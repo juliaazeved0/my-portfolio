@@ -1,0 +1,526 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Julia Azevedo — Portfolio</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Space+Mono:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --pixel: #e8f4f8;
+    --dark: #0d1117;
+    --darker: #080c10;
+    --accent1: #ff6b9d;
+    --accent2: #c77dff;
+    --accent3: #72efdd;
+    --accent4: #f9c74f;
+    --surface: #161b22;
+    --surface2: #1e2530;
+    --border: rgba(114,239,221,0.2);
+    --text: #e8f4f8;
+    --muted: #8b949e;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: var(--dark);
+    color: var(--text);
+    font-family: 'Space Mono', monospace;
+    font-size: 14px;
+    line-height: 1.7;
+    overflow-x: hidden;
+  }
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: 
+      linear-gradient(rgba(114,239,221,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(114,239,221,0.03) 1px, transparent 1px);
+    background-size: 32px 32px;
+    pointer-events: none;
+    z-index: 0;
+  }
+  body::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.08) 2px, rgba(0,0,0,0.08) 4px);
+    pointer-events: none;
+    z-index: 1;
+  }
+  .wrap { max-width: 860px; margin: 0 auto; padding: 0 2rem; position: relative; z-index: 2; }
+  nav {
+    position: sticky; top: 0;
+    background: rgba(13,17,23,0.92);
+    backdrop-filter: blur(8px);
+    border-bottom: 1px solid var(--border);
+    padding: 1rem 0; z-index: 100;
+  }
+  nav .wrap { display: flex; align-items: center; justify-content: space-between; }
+  .nav-logo { font-family: 'Press Start 2P', monospace; font-size: 10px; color: var(--accent3); letter-spacing: 1px; }
+  .nav-links { display: flex; gap: 2rem; list-style: none; }
+  .nav-links a { color: var(--muted); text-decoration: none; font-size: 12px; letter-spacing: 1px; text-transform: uppercase; transition: color 0.2s; }
+  .nav-links a:hover { color: var(--accent3); }
+
+  /* HERO */
+  .hero { padding: 5rem 0 4rem; }
+  .hero-inner { display: grid; grid-template-columns: 1fr auto; gap: 3rem; align-items: center; }
+  .hero-tag {
+    font-family: 'Press Start 2P', monospace; font-size: 9px;
+    color: var(--accent1); letter-spacing: 2px; margin-bottom: 1.5rem;
+    display: flex; align-items: center; gap: 10px;
+  }
+  .hero-tag::before {
+    content: ''; display: inline-block; width: 8px; height: 8px;
+    background: var(--accent1); animation: blink 1s step-end infinite;
+  }
+  @keyframes blink { 50% { opacity: 0; } }
+  h1 { font-family: 'Press Start 2P', monospace; font-size: clamp(16px, 2.5vw, 24px); line-height: 1.6; color: var(--text); margin-bottom: 1rem; }
+  h1 span { color: var(--accent2); }
+  .hero-sub { font-size: 13px; color: var(--muted); margin-bottom: 2rem; max-width: 480px; }
+  .hero-chips { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 2rem; }
+  .chip { font-family: 'Press Start 2P', monospace; font-size: 7px; padding: 6px 10px; border: 1px solid; letter-spacing: 1px; }
+  .chip-teal { border-color: var(--accent3); color: var(--accent3); }
+  .chip-pink { border-color: var(--accent1); color: var(--accent1); }
+  .chip-purple { border-color: var(--accent2); color: var(--accent2); }
+  .chip-yellow { border-color: var(--accent4); color: var(--accent4); }
+  .hero-links { display: flex; gap: 1rem; flex-wrap: wrap; }
+  .btn { font-family: 'Press Start 2P', monospace; font-size: 8px; padding: 12px 18px; text-decoration: none; letter-spacing: 1px; transition: all 0.15s; border: 2px solid; display: inline-flex; align-items: center; gap: 8px; }
+  .btn-primary { background: var(--accent3); border-color: var(--accent3); color: var(--darker); }
+  .btn-primary:hover { background: transparent; color: var(--accent3); }
+  .btn-outline { background: transparent; border-color: var(--accent2); color: var(--accent2); }
+  .btn-outline:hover { background: var(--accent2); color: var(--darker); }
+
+  /* FOTO */
+  .hero-photo-wrap { flex-shrink: 0; }
+  .hero-photo-frame {
+    width: 180px; height: 180px;
+    border: 2px solid var(--accent3);
+    position: relative;
+    overflow: hidden;
+  }
+  .hero-photo-frame::before {
+    content: ''; position: absolute;
+    top: -2px; left: -2px; width: 16px; height: 16px;
+    border-top: 3px solid var(--accent1); border-left: 3px solid var(--accent1);
+    z-index: 2;
+  }
+  .hero-photo-frame::after {
+    content: ''; position: absolute;
+    bottom: -2px; right: -2px; width: 16px; height: 16px;
+    border-bottom: 3px solid var(--accent1); border-right: 3px solid var(--accent1);
+    z-index: 2;
+  }
+  .photo-placeholder {
+    width: 100%; height: 100%;
+    background: var(--surface);
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    gap: 10px;
+  }
+  .photo-pixel-avatar {
+    display: grid;
+    grid-template-columns: repeat(8, 10px);
+    grid-template-rows: repeat(8, 10px);
+    gap: 2px;
+  }
+  .pp { width: 10px; height: 10px; }
+  .pp-skin { background: #f0c9a0; }
+  .pp-hair { background: var(--accent2); }
+  .pp-bg { background: transparent; }
+  .pp-eye { background: var(--darker); }
+  .photo-label { font-family: 'Press Start 2P', monospace; font-size: 6px; color: var(--muted); letter-spacing: 1px; text-align: center; line-height: 1.8; }
+
+  /* DIVIDER */
+  .px-divider { display: flex; align-items: center; gap: 12px; margin: 4rem 0 2.5rem; }
+  .px-divider-line { flex: 1; height: 1px; background: var(--border); }
+  .px-divider-label { font-family: 'Press Start 2P', monospace; font-size: 9px; color: var(--accent3); white-space: nowrap; letter-spacing: 2px; }
+
+  /* ABOUT */
+  .about-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-bottom: 2rem; }
+  .about-box { background: var(--surface); border: 1px solid var(--border); padding: 1.5rem; position: relative; }
+  .about-box::before { content: ''; position: absolute; top: -1px; left: -1px; width: 12px; height: 12px; border-top: 2px solid var(--accent3); border-left: 2px solid var(--accent3); }
+  .about-box::after { content: ''; position: absolute; bottom: -1px; right: -1px; width: 12px; height: 12px; border-bottom: 2px solid var(--accent3); border-right: 2px solid var(--accent3); }
+  .about-label { font-family: 'Press Start 2P', monospace; font-size: 7px; color: var(--accent1); letter-spacing: 2px; margin-bottom: 0.75rem; }
+  .about-text { font-size: 13px; color: var(--text); line-height: 1.8; }
+  .about-full { background: var(--surface); border: 1px solid var(--border); padding: 1.5rem; position: relative; font-size: 13px; line-height: 1.9; color: #c9d1d9; }
+  .about-full::before { content: ''; position: absolute; top: -1px; left: -1px; width: 12px; height: 12px; border-top: 2px solid var(--accent2); border-left: 2px solid var(--accent2); }
+  .about-full::after { content: ''; position: absolute; bottom: -1px; right: -1px; width: 12px; height: 12px; border-bottom: 2px solid var(--accent2); border-right: 2px solid var(--accent2); }
+
+  /* PROJECTS */
+  .projects-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
+  .project-card { background: var(--surface); border: 1px solid var(--border); padding: 1.5rem; position: relative; transition: border-color 0.2s, transform 0.2s; }
+  .project-card:hover { border-color: var(--accent3); transform: translateY(-2px); }
+  .project-card.featured { grid-column: 1 / -1; display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; align-items: start; }
+  .project-badge { font-family: 'Press Start 2P', monospace; font-size: 6px; padding: 4px 8px; letter-spacing: 1px; display: inline-block; margin-bottom: 0.75rem; }
+  .badge-active { background: rgba(114,239,221,0.15); color: var(--accent3); border: 1px solid rgba(114,239,221,0.4); }
+  .badge-game { background: rgba(255,107,157,0.15); color: var(--accent1); border: 1px solid rgba(255,107,157,0.4); }
+  .badge-research { background: rgba(199,125,255,0.15); color: var(--accent2); border: 1px solid rgba(199,125,255,0.4); }
+  .project-title { font-family: 'Press Start 2P', monospace; font-size: 11px; color: var(--text); margin-bottom: 0.75rem; line-height: 1.6; }
+  .project-desc { font-size: 12px; color: var(--muted); line-height: 1.8; margin-bottom: 1rem; }
+  .project-stack { display: flex; flex-wrap: wrap; gap: 6px; }
+  .stack-tag { font-family: 'Press Start 2P', monospace; font-size: 6px; padding: 3px 6px; border: 1px solid rgba(255,255,255,0.1); color: var(--muted); letter-spacing: 0.5px; }
+
+  .video-placeholder {
+    background: var(--darker); border: 1px dashed rgba(255,107,157,0.4);
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    gap: 12px; min-height: 180px; padding: 1.5rem;
+  }
+  .video-icon { width: 40px; height: 40px; border: 2px solid var(--accent1); display: flex; align-items: center; justify-content: center; }
+  .video-play { width: 0; height: 0; border-top: 8px solid transparent; border-bottom: 8px solid transparent; border-left: 14px solid var(--accent1); margin-left: 3px; }
+  .video-label { font-family: 'Press Start 2P', monospace; font-size: 7px; color: var(--accent1); letter-spacing: 1px; text-align: center; line-height: 1.8; }
+
+  /* SKILLS */
+  .skills-wrap { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 1.5rem; }
+  .skill-group { background: var(--surface); border: 1px solid var(--border); padding: 1.25rem; }
+  .skill-group-title { font-family: 'Press Start 2P', monospace; font-size: 7px; color: var(--accent4); letter-spacing: 2px; margin-bottom: 1rem; padding-bottom: 0.5rem; border-bottom: 1px solid rgba(249,199,79,0.2); }
+  .skill-list { list-style: none; display: flex; flex-direction: column; gap: 6px; }
+  .skill-list li { font-size: 12px; color: #c9d1d9; display: flex; align-items: center; gap: 8px; }
+  .skill-list li::before { content: ''; display: inline-block; width: 6px; height: 6px; background: var(--accent3); flex-shrink: 0; }
+
+  /* EDUCATION */
+  .edu-list { display: flex; flex-direction: column; gap: 1rem; }
+  .edu-item { background: var(--surface); border: 1px solid var(--border); border-left: 3px solid var(--accent2); padding: 1rem 1.25rem; display: flex; justify-content: space-between; align-items: start; gap: 1rem; }
+  .edu-name { font-size: 13px; font-weight: 700; color: var(--text); margin-bottom: 4px; }
+  .edu-inst { font-size: 11px; color: var(--muted); }
+  .edu-period { font-family: 'Press Start 2P', monospace; font-size: 7px; color: var(--accent4); white-space: nowrap; flex-shrink: 0; }
+  .cert-list { display: flex; flex-direction: column; gap: 0.75rem; }
+  .cert-item { background: var(--surface); border: 1px solid var(--border); border-left: 3px solid var(--accent4); padding: 0.75rem 1.25rem; display: flex; justify-content: space-between; align-items: center; gap: 1rem; }
+  .cert-name { font-size: 12px; color: var(--text); }
+  .cert-meta { font-size: 11px; color: var(--muted); text-align: right; flex-shrink: 0; }
+
+  /* ACHIEVEMENTS */
+  .ach-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+  .ach-card { background: var(--surface); border: 1px solid var(--border); padding: 1.25rem; display: flex; align-items: center; gap: 1rem; }
+  .ach-medal { font-family: 'Press Start 2P', monospace; font-size: 20px; line-height: 1; flex-shrink: 0; }
+  .ach-info-title { font-size: 13px; font-weight: 700; color: var(--text); }
+  .ach-info-sub { font-size: 11px; color: var(--muted); }
+
+  /* PUBLICATIONS */
+  .pub-list { display: flex; flex-direction: column; gap: 0.75rem; }
+  .pub-item { background: var(--surface); border: 1px solid var(--border); padding: 1rem 1.25rem; font-size: 12px; color: #c9d1d9; position: relative; padding-left: 2rem; }
+  .pub-item::before { content: '>'; position: absolute; left: 0.75rem; font-family: 'Press Start 2P', monospace; font-size: 8px; color: var(--accent3); top: 50%; transform: translateY(-50%); }
+
+  /* CONTACT */
+  .contact-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1rem; }
+  .contact-card { background: var(--surface); border: 1px solid var(--border); padding: 1.25rem; text-align: center; transition: border-color 0.2s; }
+  .contact-card:hover { border-color: var(--accent3); }
+  .contact-label { font-family: 'Press Start 2P', monospace; font-size: 7px; color: var(--muted); letter-spacing: 2px; margin-bottom: 0.5rem; }
+  .contact-value { font-size: 12px; color: var(--accent3); text-decoration: none; word-break: break-all; }
+  .contact-value:hover { color: var(--text); }
+
+  footer { border-top: 1px solid var(--border); padding: 2rem 0; margin-top: 5rem; text-align: center; }
+  .footer-text { font-family: 'Press Start 2P', monospace; font-size: 7px; color: var(--muted); letter-spacing: 2px; }
+  .footer-heart { color: var(--accent1); }
+
+  section { padding: 1rem 0 3rem; }
+
+  @media (max-width: 620px) {
+    .about-grid, .projects-grid, .ach-grid { grid-template-columns: 1fr; }
+    .project-card.featured { grid-template-columns: 1fr; }
+    .hero-inner { grid-template-columns: 1fr; }
+    .hero-photo-wrap { display: flex; justify-content: center; order: -1; }
+    h1 { font-size: 14px; }
+    .nav-links { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="wrap">
+    <div class="nav-logo">JA.dev</div>
+    <ul class="nav-links">
+      <li><a href="#sobre">sobre</a></li>
+      <li><a href="#projetos">projetos</a></li>
+      <li><a href="#skills">skills</a></li>
+      <li><a href="#formacao">formação</a></li>
+      <li><a href="#contato">contato</a></li>
+    </ul>
+  </div>
+</nav>
+
+<div class="wrap">
+
+  <!-- HERO -->
+  <section class="hero" id="sobre">
+    <div class="hero-inner">
+      <div>
+        <div class="hero-tag">player_one.exe iniciado</div>
+        <h1>Julia Caroline<br>de <span>Azevedo</span></h1>
+        <p class="hero-sub">Desenvolvedora back-end em transição de carreira. De física e professora de robótica a engenheira de software — movida por autonomia, dados e impacto real.</p>
+        <div class="hero-chips">
+          <span class="chip chip-teal">C# · .NET</span>
+          <span class="chip chip-pink">Python · Pandas</span>
+          <span class="chip chip-purple">Unity Engine</span>
+          <span class="chip chip-yellow">Foz do Iguaçu · PR</span>
+        </div>
+        <div class="hero-links">
+          <a href="https://github.com/juliaazeved0/" class="btn btn-primary" target="_blank">GitHub</a>
+          <a href="https://www.linkedin.com/in/juliaazeved0" class="btn btn-outline" target="_blank">LinkedIn</a>
+        </div>
+      </div>
+
+      <!-- FOTO -->
+      <div class="hero-photo-wrap">
+        <div class="hero-photo-frame">
+          <div class="photo-placeholder">
+            <!-- avatar pixel art decorativo -->
+            <div style="display:flex;flex-direction:column;gap:3px;align-items:center;">
+              <!-- cabeça -->
+              <div style="display:flex;gap:2px;">
+                <div class="pp pp-bg"></div><div class="pp pp-hair"></div><div class="pp pp-hair"></div><div class="pp pp-hair"></div><div class="pp pp-hair"></div><div class="pp pp-bg"></div>
+              </div>
+              <div style="display:flex;gap:2px;">
+                <div class="pp pp-hair"></div><div class="pp pp-skin"></div><div class="pp pp-skin"></div><div class="pp pp-skin"></div><div class="pp pp-skin"></div><div class="pp pp-hair"></div>
+              </div>
+              <div style="display:flex;gap:2px;">
+                <div class="pp pp-hair"></div><div class="pp pp-skin"></div><div class="pp pp-eye"></div><div class="pp pp-skin"></div><div class="pp pp-eye"></div><div class="pp pp-hair"></div>
+              </div>
+              <div style="display:flex;gap:2px;">
+                <div class="pp pp-hair"></div><div class="pp pp-skin"></div><div class="pp pp-skin"></div><div class="pp pp-skin"></div><div class="pp pp-skin"></div><div class="pp pp-hair"></div>
+              </div>
+              <div style="display:flex;gap:2px;">
+                <div class="pp pp-bg"></div><div class="pp pp-hair"></div><div class="pp pp-skin"></div><div class="pp pp-skin"></div><div class="pp pp-hair"></div><div class="pp pp-bg"></div>
+              </div>
+            </div>
+            <div class="photo-label">adicione sua<br>foto aqui</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SOBRE -->
+  <div class="px-divider"><div class="px-divider-line"></div><div class="px-divider-label">// sobre mim</div><div class="px-divider-line"></div></div>
+
+  <div class="about-grid">
+    <div class="about-box">
+      <div class="about-label">origem</div>
+      <div class="about-text">Comecei como professora de robótica e educação digital na rede municipal de Foz do Iguaçu. A sala de aula foi onde descobri que queria estar do outro lado do código — construindo, não apenas ensinando.</div>
+    </div>
+    <div class="about-box">
+      <div class="about-label">hoje</div>
+      <div class="about-text">Estagiária no Itaipu Parquetec, desenvolvendo soluções com .NET e Unity 3D para Gêmeos Digitais. Curso ADS no IFPR e contribuo como voluntária em pesquisas de ciência de dados e desenvolvimento de jogos para segurança cibernética.</div>
+    </div>
+  </div>
+  <div class="about-full">
+    Carrego da docência algo que muitos desenvolvedores levam anos para aprender: a capacidade de comunicar o complexo de forma clara, de trabalhar com empatia em equipe e de resolver problemas criativamente sob pressão. Sou movida por aprendizado contínuo, autonomia e impacto real. Minha formação em Física moldou meu raciocínio analítico — e ele acompanha cada linha de código que escrevo. Acredito que tecnologia é mais poderosa quando constrói pontes: entre dados e decisão, entre o sistema e a pessoa que ele serve.
+  </div>
+
+  <!-- PROJETOS -->
+  <div class="px-divider"><div class="px-divider-line"></div><div class="px-divider-label">// projetos</div><div class="px-divider-line"></div></div>
+
+  <section id="projetos">
+    <div class="projects-grid">
+
+      <!-- CYBERLACE FEATURED -->
+      <div class="project-card featured">
+        <div>
+          <span class="project-badge badge-game">jogo · voluntária</span>
+          <div class="project-title">Cyberlace</div>
+          <p class="project-desc">
+            Jogo top-down em pixel art desenvolvido como iniciativa do <strong style="color:var(--accent1)">Ladies in Cyber</strong> no Itaipu Parquetec (dez/2025 – abr/2026), com o objetivo de aumentar a participação feminina em CTFs de segurança cibernética. Gamifica desafios reais de OSINT, Linux, engenharia social, forense digital e criptografia.<br><br>
+            Desenvolvi a aplicação completa com autonomia total, em ciclos quinzenais de entrega, usando metodologias ágeis com Trello, Notion e Miro.
+          </p>
+          <div class="project-stack">
+            <span class="stack-tag">C#</span>
+            <span class="stack-tag">Unity Engine</span>
+            <span class="stack-tag">Pixel Art</span>
+            <span class="stack-tag">Scrum</span>
+            <span class="stack-tag">Trello</span>
+            <span class="stack-tag">Notion</span>
+          </div>
+        </div>
+        <div class="video-placeholder">
+          <div class="video-icon"><div class="video-play"></div></div>
+          <div class="video-label">gameplay video<br>em loop aqui</div>
+        </div>
+      </div>
+
+      <!-- MAPEAMENTO STACK / GEMEOS DIGITAIS -->
+      <div class="project-card">
+        <span class="project-badge badge-research">pesquisa · voluntária</span>
+        <div class="project-title">Mapeamento de Stack — Gêmeos Digitais Web</div>
+        <p class="project-desc">
+          Pesquisa para apoiar a tomada de decisão tecnológica no Itaipu Parquetec: mapeei a stack de projetos de Gêmeos Digitais na Web com Unity como engine de visualização. Usei Python e Google Colab para coletar repositórios via API do GitHub com Google Apps Script, e o ASReview com machine learning para triagem e seleção de artigos científicos relevantes — estruturando indicadores sobre tecnologias, frameworks e protocolos adotados na área.
+        </p>
+        <div class="project-stack">
+          <span class="stack-tag">Python</span>
+          <span class="stack-tag">ASReview</span>
+          <span class="stack-tag">Google Colab</span>
+          <span class="stack-tag">Jupyter</span>
+          <span class="stack-tag">Apps Script</span>
+          <span class="stack-tag">Google Sheets</span>
+          <span class="stack-tag">GitHub API</span>
+          <span class="stack-tag">Machine Learning</span>
+        </div>
+      </div>
+
+      <!-- SUSTENTABILIDADE IFPR -->
+      <div class="project-card">
+        <span class="project-badge badge-active">pesquisa · ativo</span>
+        <div class="project-title">Índices de Sustentabilidade — IFPR</div>
+        <p class="project-desc">Projeto de ciência de dados (fev/2025 – presente) que analisa consumo de energia, água, materiais e geração de esgoto dos campi do IFPR para construir indicadores institucionais de sustentabilidade. Atuo no processamento e estruturação de dados brutos.</p>
+        <div class="project-stack">
+          <span class="stack-tag">Python</span>
+          <span class="stack-tag">Pandas</span>
+          <span class="stack-tag">Jupyter</span>
+          <span class="stack-tag">ETL</span>
+          <span class="stack-tag">Matplotlib</span>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- SKILLS -->
+  <div class="px-divider"><div class="px-divider-line"></div><div class="px-divider-label">// habilidades</div><div class="px-divider-line"></div></div>
+
+  <section id="skills">
+    <div class="skills-wrap">
+      <div class="skill-group">
+        <div class="skill-group-title">linguagens</div>
+        <ul class="skill-list">
+          <li>C#</li><li>Python</li><li>Java</li><li>JavaScript</li>
+        </ul>
+      </div>
+      <div class="skill-group">
+        <div class="skill-group-title">frameworks</div>
+        <ul class="skill-list">
+          <li>.NET / ASP.NET</li><li>Spring Framework</li><li>Unity Engine</li><li>REST APIs</li>
+        </ul>
+      </div>
+      <div class="skill-group">
+        <div class="skill-group-title">dados & ML</div>
+        <ul class="skill-list">
+          <li>Pandas</li><li>Jupyter / Colab</li><li>ASReview</li><li>Matplotlib</li>
+        </ul>
+      </div>
+      <div class="skill-group">
+        <div class="skill-group-title">arquitetura</div>
+        <ul class="skill-list">
+          <li>Microsserviços</li><li>REST APIs</li><li>Git</li><li>Docker</li>
+        </ul>
+      </div>
+      <div class="skill-group">
+        <div class="skill-group-title">ferramentas</div>
+        <ul class="skill-list">
+          <li>Google Apps Script</li><li>GitHub API</li><li>Scrum / Kanban</li><li>Trello · Notion</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- FORMAÇÃO -->
+  <div class="px-divider"><div class="px-divider-line"></div><div class="px-divider-label">// formação</div><div class="px-divider-line"></div></div>
+
+  <section id="formacao">
+    <div class="edu-list">
+      <div class="edu-item">
+        <div><div class="edu-name">ADS — Análise e Desenvolvimento de Sistemas</div><div class="edu-inst">IFPR — Instituto Federal do Paraná</div></div>
+        <div class="edu-period">2024–2026</div>
+      </div>
+      <div class="edu-item">
+        <div><div class="edu-name">Especialização — Educação Digital</div><div class="edu-inst">UNIOESTE</div></div>
+        <div class="edu-period">2024</div>
+      </div>
+      <div class="edu-item">
+        <div><div class="edu-name">Especialização — Métodos e Técnicas de Ensino</div><div class="edu-inst">UTFPR — Universidade Tecnológica Federal do Paraná</div></div>
+        <div class="edu-period">2022–2024</div>
+      </div>
+      <div class="edu-item">
+        <div><div class="edu-name">Licenciatura em Física</div><div class="edu-inst">IFPR — Instituto Federal do Paraná</div></div>
+        <div class="edu-period">2017–2021</div>
+      </div>
+    </div>
+
+    <div class="px-divider" style="margin-top:2.5rem;"><div class="px-divider-line"></div><div class="px-divider-label">// certificações e cursos</div><div class="px-divider-line"></div></div>
+
+    <div class="cert-list">
+      <div class="cert-item">
+        <div class="cert-name">OCI — Oracle Cloud Infrastructure Foundations</div>
+        <div class="cert-meta">Oracle · Certificação</div>
+      </div>
+      <div class="cert-item">
+        <div class="cert-name">Introdução à Cibersegurança</div>
+        <div class="cert-meta">Cisco · Curso</div>
+      </div>
+      <div class="cert-item">
+        <div class="cert-name">Fundamentos da Programação Orientada a Objetos</div>
+        <div class="cert-meta">DIO · Curso</div>
+      </div>
+      <div class="cert-item">
+        <div class="cert-name">Sintaxe Java</div>
+        <div class="cert-meta">DIO · Curso</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CONQUISTAS -->
+  <div class="px-divider"><div class="px-divider-line"></div><div class="px-divider-label">// conquistas</div><div class="px-divider-line"></div></div>
+
+  <section>
+    <div class="ach-grid">
+      <div class="ach-card">
+        <div class="ach-medal" style="color:var(--accent4);">2</div>
+        <div>
+          <div class="ach-info-title">2º Lugar — TSW Women</div>
+          <div class="ach-info-sub">Competição de tecnologia para mulheres</div>
+        </div>
+      </div>
+      <div class="ach-card">
+        <div class="ach-medal" style="color:var(--muted);">4</div>
+        <div>
+          <div class="ach-info-title">4º Lugar — CTF SegInf 2025</div>
+          <div class="ach-info-sub">Capture The Flag · Segurança da Informação</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PUBLICAÇÕES -->
+  <div class="px-divider"><div class="px-divider-line"></div><div class="px-divider-label">// publicações</div><div class="px-divider-line"></div></div>
+
+  <section>
+    <div class="pub-list">
+      <div class="pub-item">A Mudança Epistemológica de Albert Einstein: do empirismo ao realismo</div>
+      <div class="pub-item">A importância da alfabetização científica diante do fenômeno do misticismo quântico</div>
+      <div class="pub-item">A nova atualização do ChatGPT e o impacto da Engenharia de Prompt</div>
+      <div class="pub-item">Uma proposta de ensino didática para a primeira Lei de Newton</div>
+    </div>
+  </section>
+
+  <!-- CONTATO -->
+  <div class="px-divider"><div class="px-divider-line"></div><div class="px-divider-label">// contato</div><div class="px-divider-line"></div></div>
+
+  <section id="contato">
+    <div class="contact-grid">
+      <div class="contact-card">
+        <div class="contact-label">e-mail</div>
+        <a class="contact-value" href="mailto:juliacarolinedeazevedo@gmail.com">juliacarolinedeazevedo@gmail.com</a>
+      </div>
+      <div class="contact-card">
+        <div class="contact-label">linkedin</div>
+        <a class="contact-value" href="https://www.linkedin.com/in/juliaazeved0" target="_blank">linkedin.com/in/juliaazeved0</a>
+      </div>
+      <div class="contact-card">
+        <div class="contact-label">github</div>
+        <a class="contact-value" href="https://github.com/juliaazeved0/" target="_blank">github.com/juliaazeved0</a>
+      </div>
+      <div class="contact-card">
+        <div class="contact-label">localização</div>
+        <span class="contact-value" style="cursor:default;color:var(--accent3);">Foz do Iguaçu · PR<br>Disponível remoto</span>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<footer>
+  <div class="footer-text">feito com <span class="footer-heart">♥</span> · julia azevedo · 2026 · foz do iguaçu</div>
+</footer>
+
+</body>
+</html>
